@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const app = express();
 const path = require("path");
 const cookieParser = require('cookie-parser')
+require('dotenv').config()
 
 app.use(cookieParser())
 app.set("view engine", "ejs");

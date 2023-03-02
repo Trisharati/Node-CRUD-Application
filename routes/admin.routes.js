@@ -47,6 +47,19 @@ const storage = multer.diskStorage({
   router.post('/register',upload.single('image'),adminController.register)
   router.post('/login',adminController.login)
   router.get('/logout',adminController.logout)
+  router.get('/table_view',upload.single('image'),adminController.table_view)
+  router.get('/edit/:id',adminController.editUser)
+  router.post('/update_user',adminController.update)
+  router.get('/delete/:id',adminController.delete)
+  /*FAQ Routes */
+  router.get('/faq',adminController.faq_view)
+  router.get('/faqEdit/:id',adminController.userAuth,adminController.faqEdit)
+  router.get('/FAQform',adminController.FAQform)
+  router.post('/faqUpdate',adminController.faqUpdate)
+  router.post('/postFAQ',adminController.postFAQ)
+
+  router.get('/addUser',adminController.addUser)
+  router.post('/add',upload.single('image'),adminController.add)
 
   
 

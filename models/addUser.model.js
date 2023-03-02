@@ -4,7 +4,7 @@ const logRegSchema = new mongoose.Schema(
   {
     role: {
       type: String,
-      // default: "User",
+      default: "User",
       enum: ["Admin", "User"],
     },
     firstName: {
@@ -40,4 +40,4 @@ const logRegSchema = new mongoose.Schema(
   }
 );
 
-module.exports = new mongoose.model("logReg", logRegSchema);
+module.exports = new mongoose.model("addUser", logRegSchema);
