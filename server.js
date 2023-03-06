@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const app = express();
 const path = require("path");
 const cookieParser = require('cookie-parser')
+const flash = require('connect-flash');
+const session = require('express-session');
 require('dotenv').config()
 
 app.use(cookieParser())
@@ -15,6 +17,14 @@ app.use(
     extended: true,
   })
 );
+
+//setting up the connect-flash and express-session
+app.use(session({
+  secret: 'M3S3CR3PKY5',
+  saveUninitialized: true,
+  resave: true
+}));
+app.use(flash());
 
 const dbDriver =
   "mongodb+srv://trisharati:vE9tAJ40v0HkfNxX@cluster0.kkmvasl.mongodb.net/basicadmin";

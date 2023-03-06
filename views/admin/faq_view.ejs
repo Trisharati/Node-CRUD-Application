@@ -16,43 +16,22 @@
             <div id="content">
 
 <%- include('layouts/topnav') %>
-
+<a href="/admin/FAQform">Add FAQ</a>
+<% faqData.map((data)=> { %>
 <div class="list-group w-100">
     <a href="#shortExampleAnswer1collapse" data-mdb-toggle="collapse" aria-expanded="false"
       aria-controls="shortExampleAnswer1collapse" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">what if you cannot view the Dashboard</h5>
+        <h5 class="mb-1"><b><%= data.question%></b></h5>
       </div>
       
-        Please register first with your details and then login to view the Dashboard.
-        <% faqData.map((data,index)=> { %>
+       <%= data.answer%>
+        
            <a href="/admin/faqEdit/<%= data._id %>"> Edit </a>
+           <a href="/admin/deleteFAQ/<%= data._id %>"> Delete </a> 
            <% }) %>
     </a>
-    <a href="#shortExampleAnswer2collapse" data-mdb-toggle="collapse" aria-expanded="false"
-      aria-controls="shortExampleAnswer1collapse" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">What if your session is expired</h5>
-      </div>
     
-        Please login again with your credentials.
-      
-    </a>
-    <a href="#shortExampleAnswer3collapse" data-mdb-toggle="collapse" aria-expanded="false"
-      aria-controls="shortExampleAnswer1collapse" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">Login Problem</h5>
-      </div>
-      
-        Please recheck your email id and password.If credentials does not match reach out to us at
-        email : helpdesk@webskitters.
-        Phone : 9758641234
-      
-    </a>
-  </div>
-
-</div>
-</div>
 </div>
 <%- include('layouts/siteFooter')%>
 <%- include('layouts/footer')%>
