@@ -16,6 +16,14 @@
             <div id="content">
 
 <%- include('layouts/topnav') %>
+
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  <h3><%= message ? message : ' ' %></h3>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<h3>FAQs</h3>
 <a href="/admin/FAQform">Add FAQ</a>
 <% faqData.map((data)=> { %>
 <div class="list-group w-100">

@@ -51,6 +51,9 @@ const storage = multer.diskStorage({
   router.get('/edit/:id',adminController.editUser)
   router.post('/update_user',upload.single('image'),adminController.update)
   router.get('/delete/:id',adminController.delete)
+  router.get('/addUser',adminController.addUser)
+  router.post('/add',upload.single('image'),adminController.add)
+
   /*FAQ Routes */
   router.get('/faq',adminController.faq_view)
   router.get('/FAQform',adminController.FAQform)
@@ -59,9 +62,13 @@ const storage = multer.diskStorage({
   router.post('/faqUpdate',adminController.faqUpdate)
   router.get('/deleteFAQ/:id',adminController.deleteFAQ)
 
-  router.get('/addUser',adminController.addUser)
-  router.post('/add',upload.single('image'),adminController.add)
-
-  
+ 
+  /*Blog Segment */
+  router.get('/blogForm',adminController.blogForm)
+  router.get('/blogView',adminController.blogView)
+  router.post('/postBlog',upload.single('image'),adminController.postBlog)
+  router.get('/editBlog/:id',adminController.userAuth,adminController.editBlog)
+  router.post('/updateBlog',upload.single('image'),adminController.updateBlog)
+  router.get('/deleteBlog/:id',adminController.deleteBlog)
 
 module.exports = router;

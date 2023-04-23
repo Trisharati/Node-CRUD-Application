@@ -1,9 +1,10 @@
 const adminModel = require('../models/admin.model.js')
 const addUserModel = require('../models/addUser.model.js')
 const faqModel = require('../models/faq.model.js')
+const blogModel = require('../models/blog.model.js')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const fs = require('fs');
+// const fs = require('fs');
 
 class AdminController {
   constructor() {}
@@ -78,36 +79,14 @@ class AdminController {
     }
   }
 
-  async table_view(req,res){
-    try{
-      let table_data = await addUserModel.find({})
-      res.render('admin/tableView',{
-        title : 'Admin || User Data',
-        table_data,
-        user:req.user,
-      })
-    }catch(err){
-      throw err
-    }
-  }
-
-  async addUser(req,res){
-    try{
-      res.render('admin/addUser',{
-        title : 'Admin || Add User',
-        user:req.user,
-        message: req.flash('message')
-      })
-    }catch(err){
-      throw err
-    }
-  }
+ 
 
   async register(req,res){
     try {
       
       console.log(req.file);
       req.body.image = req.file.filename
+      
       let isEmailExist = await adminModel.findOne({email:req.body.email})
       if(!isEmailExist){
       if(req.body.password === req.body.confirmPassword){
@@ -148,7 +127,6 @@ class AdminController {
         email : req.body.email,
         
       })
-      // console.log(isUserExist.email);
       if(isUserExist){
         
         const hashPassword = isUserExist.password
@@ -161,10 +139,12 @@ class AdminController {
           },'MED849SDI',{expiresIn : '1h'})
         console.log('Login successful');
         res.cookie('userToken',token)
+        req.flash('message','Login successful')
         res.redirect('/admin/dashboard')
         }
         else{
           console.log('Wrong Password');
+          req.flash('message','Login not successful')
           res.redirect('/admin')
         }
       }
@@ -176,25 +156,53 @@ class AdminController {
       throw error
     }
   }
-
-async editUser(req,res){
-  try {
-    let student_data = await addUserModel.find({_id:req.params.id})
-    console.log(student_data);
-    res.render('admin/edit.ejs',{
-      title  :'Edit || Page',
-      response : student_data[0],
-    })
-  } catch (error) {
-    throw error
+  async table_view(req,res){
+    try{
+      let table_data = await addUserModel.find({})
+      res.render('admin/tableView',{
+        title : 'Admin || User Data',
+        table_data,
+        user:req.user,
+        message: req.flash('message')
+      })
+    }catch(err){
+      throw err
+    }
   }
-}
+
+  async addUser(req,res){
+    try{
+      res.render('admin/addUser',{
+        title : 'Admin || Add User',
+        user:req.user,
+        message: req.flash('message')
+      })
+    }catch(err){
+      throw err
+    }
+  }
+
+  async editUser(req,res){
+    try {
+      let student_data = await addUserModel.find({_id:req.params.id})
+      console.log(student_data);
+      res.render('admin/edit.ejs',{
+        title  :'Edit || Page',
+        response : student_data[0],
+        message: req.flash('message')
+      })
+    } catch (error) {
+      throw error
+    }
+  }
+
 /*Add New User*/
 async add(req,res){
   try {
     
     console.log(req.file);
     req.body.image = req.file.filename
+    
     let isEmailExist = await addUserModel.findOne({email:req.body.email})
     if(!isEmailExist){
     if(req.body.password === req.body.confirmPassword){
@@ -229,29 +237,31 @@ async add(req,res){
 }
 async update(req,res){
   try {
+    
     let isEmailExist = await addUserModel.findOne({
       email:req.body.email,
       _id:{$ne:req.body.id}
     })
     if(!isEmailExist){
+      if(req.file){
+        req.body.image = req.file.filename
+      }
       let isPhoneExist = await addUserModel.findOne({
         phone: req.body.phone,
         _id:{$ne : req.body.id}
       })
       if(!isPhoneExist){
-
+        
       let data = await addUserModel.find({ _id: req.body.id });
-      
-        let student_update = await addUserModel.findByIdAndUpdate(req.body.id,req.body)
-        // if (req.file && req.file.filename) {
+      if (req.file && req.body.filename) {
           
-        //   fs.unlinkSync(`./public/uploads/${data[0].image}`)
-        // }
-
-        if(student_update && student_update._id){
+        fs.unlinkSync(`./public/uploads/${data[0].image}`)
+      }
+        let student_update = await addUserModel.findByIdAndUpdate(req.body.id,req.body)
+         if(student_update && student_update._id){
           console.log('Details are updated');
-          res.redirect('/admin/table_view')
           req.flash('message','User updated successfully')
+          res.redirect('/admin/table_view')
         }
       
               else{
@@ -280,6 +290,7 @@ async delete(req,res){
     let deletedata = await addUserModel.findByIdAndRemove(req.params.id)
     if(deletedata){
       console.log('User deleted successfully');
+      req.flash('message','User deleted successfully')
       res.redirect('/admin/table_view')
     }
     else{
@@ -295,6 +306,7 @@ async delete(req,res){
     try{    
       res.clearCookie('userToken');
       console.log('Cookie cleared');
+      req.flash('message','Logged out')
       res.redirect('/admin');
     }
     catch(error){
@@ -307,7 +319,8 @@ async FAQform(req,res){
   try {
     res.render('admin/faqform.ejs',{
       title : 'FAQ || Form',
-      user:req.user,})
+      user:req.user,
+      message:req.flash('message')})
   } catch (error) {
     throw error
   }
@@ -322,6 +335,7 @@ async faq_view(req,res){
       title : 'Admin || FAQ',
       user:req.user,
       faqData,
+      message:req.flash('message')
     })
   }catch(err){
     throw err
@@ -334,7 +348,6 @@ async faqEdit(req, res) {
     let faqData = await faqModel.find({ _id: req.params.id });
     res.render('admin/faqEdit.ejs', {
       title: 'FAQ || Edit',
-      // message: req.flash('message'),
       user: req.user,
       response: faqData[0]
     })
@@ -351,12 +364,12 @@ async postFAQ(req,res){
     if (req.body.question || req.body.answer) {
       let faqData = await faqModel.create(req.body);
       if (faqData && faqData._id) {
-        // req.flash('message', 'Data Entered Successful!!');
+        req.flash('message', 'FAQ Entered Successfully!!');
         console.log('FAQ added successfully');
         console.log(faqData);
         res.redirect('/admin/faq');
       } else {
-        // req.flash('message', 'Data entry Not Successful!!');
+        req.flash('message', 'FAQ entry Not Successful!!');
         console.log('FAQ not added');
         res.redirect('/admin/faq');
       }
@@ -370,17 +383,15 @@ async postFAQ(req,res){
 }
 async faqUpdate(req, res) {
   try {
-    // let data = await AdminFaq.find({_id: req.body.id});
+   
     let questUpdate = await faqModel.findByIdAndUpdate(req.body.id, req.body);
-    console.log(req.body, "req.body");
-    console.log(questUpdate, "questUpdate");
     if (questUpdate && questUpdate._id) {
       console.log('FAQ Updated');
-      // req.flash('message', 'Data Updated!!');
+      req.flash('message', 'FAQ Updated!!');
       res.redirect('/admin/faq');
     } else {
       console.log('FAQ not updated');
-      // req.flash('message', 'Data Not Updated!');
+      req.flash('message', 'FAQ Not Updated!');
       res.redirect('/admin/faq');
     }
   }
@@ -394,10 +405,12 @@ async deleteFAQ(req,res){
     let deletedata = await faqModel.findByIdAndRemove(req.params.id)
     if(deletedata){
       console.log('FAQ deleted successfully');
+      req.flash('message','FAQ deleted successfully')
       res.redirect('/admin/faq')
     }
     else{
       console.log('FAQ not deleted');
+      req.flash('message','FAQ not deleted')
       res.redirect('/admin/faq')
     }
   } catch (error) {
@@ -405,6 +418,113 @@ async deleteFAQ(req,res){
   }
 }
 /*End of FAQ segment*/
+
+/* Start of Blog segment */
+async blogForm(req,res){
+  try{
+    res.render('admin/blogForm.ejs',{
+      title : 'Admin || Add Blog',
+      user:req.user,
+    })
+  }catch(err){
+    throw err
+  }
+}
+
+async blogView(req,res){
+  try{
+    let blogData = await blogModel.find({ isDeleted: false });
+    
+    res.render('admin/blogView.ejs',{
+      title : 'Admin || Blog View',
+      user:req.user,
+      blogData,
+      message:req.flash('message')
+    })
+  }catch(err){
+    throw err
+  }
+}
+
+/* To render edit Blog page */
+async editBlog(req, res) {
+  try {
+    let blogData = await blogModel.find({ _id: req.params.id });
+    res.render('admin/editBlog.ejs', {
+      title: 'FAQ || Edit',
+      user: req.user,
+      response: blogData[0]
+    })
+  } catch (err) {
+    throw err;
+  }
+}
+
+async postBlog(req,res){
+  try {
+    req.body.image = req.file.filename
+    let blogData = await blogModel.create(req.body)
+    if(blogData && blogData._id){
+      console.log('Blog created')
+      req.flash('message','Blog created')
+      res.redirect('/admin/blogView')
+
+    }
+    else{
+      console.log('Blog has not been created');
+      req.flash('message','Blog has not been created')
+      res.redirect('/admin/blogView')
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
+async updateBlog(req, res) {
+  try {
+
+    let blogData = await blogModel.find({_id:req.body.id})
+    if (req.file && req.body.filename) {
+          
+          fs.unlinkSync(`./public/uploads/${blogData[0].image}`)
+        }
+        if(req.file){
+          req.body.image = req.file.filename
+        }
+    let blogUpdate = await blogModel.findByIdAndUpdate(req.body.id, req.body);
+    if (blogUpdate && blogUpdate._id) {
+      console.log('Blog Updated');
+      req.flash('message', 'Blog Updated!!');
+      res.redirect('/admin/blogView');
+    } else {
+      console.log('Blog not updated');
+      req.flash('message', 'Blog Not Updated!');
+      res.redirect('/admin/blogView');
+    }
+  }
+  catch (err) {
+    console.log(err);
+    throw err;
+  }
+}
+
+async deleteBlog(req,res){
+  try {
+    let deleteBlog = await blogModel.findByIdAndRemove(req.params.id)
+    if(deleteBlog){
+      console.log('Blog deleted successfully');
+      req.flash('message','Blog deleted successfully')
+      res.redirect('/admin/blogView')
+    }
+    else{
+      console.log('Blog not deleted');
+      req.flash('message','Blog not deleted')
+      res.redirect('/admin/blogView')
+    }
+  } catch (error) {
+    throw error
+  }
+}
 
 }
 

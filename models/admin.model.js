@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
+
 const logRegSchema = new mongoose.Schema(
   {
     role: {
       type: String,
-      // default: "User",
+      default: 'User',
       enum: ["Admin", "User"],
     },
     firstName: {
